@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/vedhavyas/go-wasm"
+	wasm "github.com/vedhavyas/go-wasm"
 )
 
 func addProxy(b *wasm.Bridge) wasm.Func {
@@ -24,7 +24,8 @@ func multiply(b *wasm.Bridge, a int) (int, error) {
 }
 
 func main() {
-	b, err := wasm.BridgeFromFile("test", "./examples/function-wasm/main.wasm", nil)
+	// b, err := wasm.BridgeFromFile("test", "./examples/function-wasm/main.wasm", nil)
+	b, err := wasm.TinyBridgeFromFile("test", "./examples/function-wasm2/tiny.wasm", nil)
 	if err != nil {
 		panic(err)
 	}
