@@ -301,23 +301,35 @@ func (b *Bridge) getUint32(offset int32) uint32 {
 }
 
 func (b *Bridge) loadSlice(addr int32) []byte {
+	return b.loadSliceTiny(addr, addr+8, 0) // no one uses cap?
+}
+
+func (b *Bridge) loadSliceTiny(arr, alen, acap int32) []byte {
 	mem := b.mem()
-	array := binary.LittleEndian.Uint64(mem[addr+0:])
-	length := binary.LittleEndian.Uint64(mem[addr+8:])
+	array := binary.LittleEndian.Uint64(mem[arr:])
+	length := binary.LittleEndian.Uint64(mem[alen:])
 	return mem[array : array+length]
 }
 
 func (b *Bridge) loadString(addr int32) string {
-	d := b.loadSlice(addr)
+	return b.loadStringTiny(addr, addr+8)
+}
+
+func (b *Bridge) loadStringTiny(ptr, plen int32) string {
+	d := b.loadSliceTiny(ptr, plen, 0)
 	return string(d)
 }
 
 func (b *Bridge) loadSliceOfValues(addr int32) []interface{} {
-	arr := int(b.getInt64(addr + 0))
-	arrLen := int(b.getInt64(addr + 8))
-	vals := make([]interface{}, arrLen, arrLen)
-	for i := 0; i < int(arrLen); i++ {
-		vals[i] = b.loadValue(int32(arr + i*8))
+	return b.loadSliceOfValuesTiny(addr, addr+8, 0)
+}
+
+func (b *Bridge) loadSliceOfValuesTiny(arr, alen, acap int32) []interface{} {
+	array := int(b.getInt64(arr))
+	length := int(b.getInt64(alen))
+	vals := make([]interface{}, length, length)
+	for i := 0; i < length; i++ {
+		vals[i] = b.loadValue(int32(array + i*8))
 	}
 
 	return vals
